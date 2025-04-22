@@ -37,3 +37,14 @@
 .create-story-button:hover {
   background-color: #0056b3;
 }
+
+.error-message {
+  color: #f00;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.loading-message {
+  color: #777;
+  font-style: italic;
+}
