@@ -1,24 +1,16 @@
 <script setup>
-  import StoryList from './components/StoryList.vue';
+import MainPage from './components/MainPage.vue';
 </script>
 
 <template>
   <main>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" height="125" />
-    <div class="wrapper">
-      <StoryList />
-    </div>
+    <MainPage />
   </main>
 </template>
 
 <style scoped>
-  .wrapper {
-    background: #eee;
-    padding: 1rem;
-    border-radius: 8px;
-  }
-  .logo {
-    display: block;
-    margin: 0 auto 2rem;
-  }
+/* You can remove or adjust the existing styles in App.vue */
+main {
+  padding: 20px;
+}
 </style>
