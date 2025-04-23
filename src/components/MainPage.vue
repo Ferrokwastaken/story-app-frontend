@@ -32,12 +32,12 @@
       <h1>Story App</h1>
     </header>
 
-    <main class="story-list-container">
-      <div v-if="error" class="error-message">Error loading stories: {{ error }}</div>
-      <ul v-else-if="stories.length > 0" class="story-list">
-        <li v-for="story in stories" :key="story.uuid">{{ story.title }}</li>
+    <main class="container">
+      <div v-if="error" class="bg-danger">Error loading stories: {{ error }}</div>
+      <ul v-else-if="stories.length > 0" class="list-group list-group-horizontal">
+        <li v-for="story in stories" :key="story.uuid" class="list-group-item">{{ story.title }}</li>
       </ul>
-      <div v-else class="fst-italic text-secondary">Loading stories...</div>
+      <div v-else class="fst-italic text-secondary text-center">Loading stories...</div>
     </main>
 
     <button class="btn btn-primary" @click="handleCreateStory">Create Story</button>
