@@ -37,10 +37,10 @@
       <ul v-else-if="stories.length > 0" class="story-list">
         <li v-for="story in stories" :key="story.uuid">{{ story.title }}</li>
       </ul>
-      <div v-else class="loading-message">Loading stories...</div>
+      <div v-else class="fst-italic text-secondary">Loading stories...</div>
     </main>
 
-    <button class="create-story-button" @click="handleCreateStory">Create Story</button>
+    <button class="btn btn-primary" @click="handleCreateStory">Create Story</button>
   </div>
 </template>
 
