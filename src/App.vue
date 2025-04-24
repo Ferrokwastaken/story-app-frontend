@@ -18,6 +18,9 @@ import { RouterLink } from 'vue-router';
             <li class="nav-item">
               <router-link to="/create" class="nav-link" active-class="active">Create Story</router-link>
             </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">Moderator Login</a>
+            </li>
             </ul>
           </div>
       </div>

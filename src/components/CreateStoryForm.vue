@@ -19,9 +19,32 @@ onMounted(() => {
   })
 })
 
-const handleSaveStory = () => {
-  console.log('Title:', storyTitle.value)
-  console.log('Content:', storyContent.value)
+const handleSaveStory = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/stories', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: storyTitle.value,
+        content: storyContent.value,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('Error saving story:', errorData)
+      return
+    }
+
+    const data = await response.json()
+    console.log('Story saved successfully:', data)
+    alert('Story saved successfully!')
+    router.push('/')
+  } catch (error) {
+    console.error('Error sending the save request:', error)
+  }
 }
 
 const ReturnToMainPage = () => {
@@ -50,7 +73,7 @@ const ReturnToMainPage = () => {
                 <div id="quill-editor" style="height: 300px; border: 1px solid #ccc;"></div>
               </div>
               <div class="d-grid">
-                <button type="submit" class="btn btn-success btn-lg">Save Story</button>
+                <button type="submit" class="btn btn-success btn-lg" @click="handleSaveStory">Save Story</button>
               </div>
             </form>
             <div class="d-grid">
