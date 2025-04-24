@@ -11,22 +11,28 @@
     const uuid = route.params.uuid
     loading.value = true
     error.value = null
+    story.value = null
 
     try {
-      // Simulating the API call
-      console.log('Fetching story with UUID:', uuid)
-      setTimeout(() => {
-        story.value = {
-          uuid: uuid,
-          title: 'Placeholder',
-          content: '<p>Placeholder text</p>'
+      const response = await fetch(`http://localhost:8000/api/stories/${uuid}`)
+      if (!response.ok) {
+        if (response.status === 404) {
+          error.value = 'Story not found'
+        } else {
+          error.value = 'Failed to load story'
+          console.error('Failed to load story:', await response.json())
         }
-        loading.value = false
-      }, 1000)      
-    } catch (err) {
-      error.value = err.message
+        return
+      }
+      const data = await response.json()
+      story.value = data.data
       loading.value = false
-      console.log('Error loading the story: ', error)
+    } catch (err) {
+      error.value = 'An error ocurred while loading the story'
+      loading.value = false
+      console.log('Error loading the story: ', err)
+    } finally {
+      loading.value = false
     }
   })
 </script>
