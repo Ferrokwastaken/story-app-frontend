@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router"; // Provided by Vue Router
 import MainPage from "../components/MainPage.vue";
 import CreateStoryForm from "../components/CreateStoryForm.vue";
+import ShowStory from "../components/ShowStory.vue";
 
 const routes = [
   {
@@ -12,6 +13,11 @@ const routes = [
     path: '/create',
     name: 'Create',
     component: CreateStoryForm,
+  },
+  {
+    path: '/stories/:uuid',
+    name: 'Show',
+    component: ShowStory,
   },
 ]
 

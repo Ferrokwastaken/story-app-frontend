@@ -8,8 +8,10 @@ const quillEditor = ref(null)
 const storyContent = ref('')
 const storyTitle = ref('')
 const router = useRouter()
+const categories = ref([])
+const selectedCategoryId = ref('')
 
-onMounted(() => {
+onMounted(async () => {
   quillEditor.value = new Quill('#quill-editor', {
     theme: 'snow',
   })
@@ -17,6 +19,19 @@ onMounted(() => {
   quillEditor.value.on('text-change', () => {
     storyContent.value = quillEditor.value.root.innerHTML
   })
+
+  try {
+    const response = await fetch('http://localhost:8000/api/categories')
+
+    if (!response.ok) {
+      console.error('Failed to fetch categories', await response.json())
+      return
+    }
+    const data = await response.json()
+    categories.value = data.data
+  } catch (error) {
+    console.error('Error fetching categories: ', error)
+  }
 })
 
 const handleSaveStory = async () => {
@@ -29,6 +44,7 @@ const handleSaveStory = async () => {
       body: JSON.stringify({
         title: storyTitle.value,
         content: storyContent.value,
+        category_id: selectedCategoryId.value,
       }),
     })
 
@@ -46,11 +62,6 @@ const handleSaveStory = async () => {
     console.error('Error sending the save request:', error)
   }
 }
-
-const ReturnToMainPage = () => {
-  console.log('Return to main menu button pressed!');
-  router.push('/')
-}
 </script>
 
 <template>
@@ -65,20 +76,23 @@ const ReturnToMainPage = () => {
             <form @submit.prevent="handleSaveStory">
               <div class="mb-3">
                 <label for="storyTitle" class="form-label">Title</label>
-                <input type="text" id="storyTitle" class="form-control" v-model="storyTitle"
-                  placeholder="Enter your story title">
+                <input type="text" id="storyTitle" class="form-control" v-model="storyTitle" placeholder="Enter your story title">
+              </div>
+              <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select id="category" class="form-select" v-model="selectedCategoryId">
+                  <option value="" disabled>Select a category</option>
+                  <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+                </select>
               </div>
               <div class="mb-3">
                 <label for="quill-editor" class="form-label">Your Story</label>
                 <div id="quill-editor" style="height: 300px; border: 1px solid #ccc;"></div>
               </div>
               <div class="d-grid">
-                <button type="submit" class="btn btn-success btn-lg" @click="handleSaveStory">Save Story</button>
+                <button type="submit" class="btn btn-success btn-lg">Save Story</button>
               </div>
             </form>
-            <div class="d-grid">
-              <button class="btn btn-secondary btn-lg mt-2" @click="ReturnToMainPage">Return To Main Page</button>
-            </div>
           </div>
         </div>
       </div>
@@ -87,5 +101,4 @@ const ReturnToMainPage = () => {
 </template>
 
 <style scoped>
-
 </style>

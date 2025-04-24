@@ -19,28 +19,31 @@
       console.error('Error fetching stories', err)
     }
   })
-
-  const handleCreateStory = () => {
-    console.log('Create Story button clicked!')
-    router.push('/create')
-  }
 </script>
 
 <template>
   <div class="main-page">
-    <header class="main-header">
-      <h1>Story App</h1>
+    <header class="main-header bg-light py-3 mb-4">
+      <div class="container">
+        <h1>Story App</h1>
+      </div>
     </header>
 
     <main class="container">
-      <div v-if="error" class="bg-danger">Error loading stories: {{ error }}</div>
-      <ul v-else-if="stories.length > 0" class="list-group list-group-horizontal">
-        <li v-for="story in stories" :key="story.uuid" class="list-group-item">{{ story.title }}</li>
+      <div v-if="error" class="alert alert-danger">{{ error }}</div>
+      <ul v-else-if="stories.length > 0" class="list-group">
+        <li v-for="story in stories" :key="story.uuid" class="list-group-item list-group-item-action">
+          <router-link :to="{ name: 'Show', params: { uuid: story.uuid } }" class="text-decoration-none text-dark">
+            {{ story.title }}
+          </router-link>
+        </li>
       </ul>
-      <div v-else class="fst-italic text-secondary text-center">Loading stories...</div>
+      <div v-else class="fst-italic text-secondary text-center py-5">Loading stories...</div>
     </main>
 
-    <button class="btn btn-primary" @click="handleCreateStory">Create Story</button>
+    <div class="container mt-4 text-center">
+      <router-link to="/create" class="btn btn-primary">Create Story</router-link>
+    </div>
   </div>
 </template>
 
