@@ -1,56 +1,15 @@
 <script setup>
-  import {ref, onMounted} from 'vue'
-  import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useFetchStories } from '@/composables/MainPageComponent/useFetchStories'
+import { useFetchCategories } from '@/composables/useFetchCategories'
 
-  const stories = ref([])
-  const error = ref(null)
-  const router = useRouter()
-  const categories = ref([])
-  const filterTitle = ref('')
-  const filterCategory = ref('')
+const router = useRouter()
+const filterTitle = ref('')
+const filterCategory = ref('')
 
-  // Start by fetching the stories without applying any filters
-  const fetchStories = async (title = '', categoryId = '') => {
-  try {
-    let url = 'http://localhost:8000/api/stories?'
-    // If the request has either the title of a story or a category
-    // add them to the URL
-    if (title) {
-      url += `title=${encodeURIComponent(title)}&`
-    }
-    if (categoryId) {
-      url += `category_id=${categoryId}&`
-    }
-    url = url.slice(0, -1) // Remove the trailing '&' if any
-
-    console.log('Fetching URL:', url)
-    const response = await fetch(url)
-    if (!response.ok) {
-      error.value = 'Failed to load stories.'
-      console.error('Failed to load stories:', await response.json())
-      return
-    }
-    const data = await response.json()
-    stories.value = data.data
-  } catch (err) {
-    error.value = 'An error occurred while loading stories.'
-    console.error('Error loading stories:', err)
-  }
-}
-
-const fetchCategories = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/categories')
-    if (!response.ok) {
-      console.error('Failed to fetch categories:', await response.json())
-      return
-    }
-    const data = await response.json()
-    categories.value = data.data
-  } catch (error) {
-    console.error('Error fetching categories:', error)
-  }
-}
+const { stories, error, fetchStories } = useFetchStories()
+const { categories, fetchCategories } = useFetchCategories()
 
 const applyFilters = () => {
   console.log(filterCategory.value)
@@ -81,7 +40,8 @@ onMounted(() => {
           <label for="filterCategory" class="form-label">Filter by Category:</label>
           <select id="filterCategory" class="form-select" v-model="filterCategory" @change="applyFilters">
             <option value="">All Categories</option>
-            <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }} - {{ category.id }}</option>
+            <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }} - {{
+              category.id }}</option>
           </select>
         </div>
       </div>
@@ -90,7 +50,8 @@ onMounted(() => {
     <main class="container">
       <div v-if="error" class="alert alert-danger">{{ error }}</div>
       <ul v-else-if="stories.length > 0" class="list-group">
-        <li v-for="story in stories" :key="story.uuid" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <li v-for="story in stories" :key="story.uuid"
+          class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
           <router-link :to="{ name: 'Show', params: { uuid: story.uuid } }" class="text-decoration-none text-dark">
             {{ story.title }}
           </router-link>

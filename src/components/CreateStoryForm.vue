@@ -2,14 +2,18 @@
 import { ref, onMounted } from 'vue'
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css'
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
+import { useSaveStory } from '@/composables/CreateStoryFormComponent/useSaveStory';
+import { useFetchCategories } from '@/composables/useFetchCategories';
 
 const quillEditor = ref(null)
 const storyContent = ref('')
 const storyTitle = ref('')
 const router = useRouter()
-const categories = ref([])
 const selectedCategoryId = ref('')
+
+const { handleSaveStory, saveError, isSaving } = useSaveStory(storyTitle, storyContent, selectedCategoryId)
+const { categories, fetchCategories } = useFetchCategories()
 
 onMounted(async () => {
   quillEditor.value = new Quill('#quill-editor', {
@@ -20,48 +24,8 @@ onMounted(async () => {
     storyContent.value = quillEditor.value.root.innerHTML
   })
 
-  try {
-    const response = await fetch('http://localhost:8000/api/categories')
-
-    if (!response.ok) {
-      console.error('Failed to fetch categories', await response.json())
-      return
-    }
-    const data = await response.json()
-    categories.value = data.data
-  } catch (error) {
-    console.error('Error fetching categories: ', error)
-  }
+  fetchCategories()
 })
-
-const handleSaveStory = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/stories', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: storyTitle.value,
-        content: storyContent.value,
-        category_id: selectedCategoryId.value,
-      }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('Error saving story:', errorData)
-      return
-    }
-
-    const data = await response.json()
-    console.log('Story saved successfully:', data)
-    alert('Story saved successfully!')
-    router.push('/')
-  } catch (error) {
-    console.error('Error sending the save request:', error)
-  }
-}
 </script>
 
 <template>
