@@ -35,6 +35,9 @@ const toggleAddTags = () => {
             </div>
             <div v-else class="mb-3 text-muted">No tags added yet.</div>
 
+            <p class="card-text text-muted fst-italic" v-if="story.description">{{ story.description }}</p>
+            <p class="card-text fst-italic text-muted" v-else>No description available for this story.</p>
+
             <hr class="my-4">
 
             <div class="mb-3">

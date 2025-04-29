@@ -50,13 +50,22 @@ onMounted(() => {
     <main class="container">
       <div v-if="error" class="alert alert-danger">{{ error }}</div>
       <ul v-else-if="stories.length > 0" class="list-group">
-        <li v-for="story in stories" :key="story.uuid"
-          class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-          <router-link :to="{ name: 'Show', params: { uuid: story.uuid } }" class="text-decoration-none text-dark">
-            {{ story.title }}
-          </router-link>
-          <span v-if="story.category" class="badge bg-secondary">{{ story.category.name }}</span>
-          <span v-else class="badge bg-light text-secondary">No Category</span>
+        <li v-for="story in stories" :key="story.uuid" class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
+            :data-bs-target="'#description-' + story.uuid" aria-expanded="false"
+            aria-controls="'description-' + story.uuid" style="cursor: pointer;">
+            <h6 class="mb-0 text-dark">{{ story.title }}</h6>
+            <div>
+              <span v-if="story.category" class="badge bg-secondary me-2">{{ story.category.name }}</span>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+          </div>
+          <div class="collapse mt-2" :id="'description-' + story.uuid">
+            <p class="text-muted">{{ story.description }}</p>
+            <router-link :to="{ name: 'Show', params: { uuid: story.uuid } }" class="btn btn-sm btn-primary">
+              Read More
+            </router-link>
+          </div>
         </li>
       </ul>
       <div v-else class="fst-italic text-secondary text-center py-5">Loading stories...</div>
@@ -68,4 +77,8 @@ onMounted(() => {
   </div>
 </template>
 
-<style src="../styles/mainPage.css" scoped></style>
+<style src="../styles/mainPage.css" scoped>
+.list-group-item {
+  padding: 0.75rem 1.25rem;
+}
+</style>

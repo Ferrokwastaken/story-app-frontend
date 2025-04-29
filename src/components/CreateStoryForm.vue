@@ -11,8 +11,9 @@ const storyContent = ref('')
 const storyTitle = ref('')
 const router = useRouter()
 const selectedCategoryId = ref('')
+const storyDescription = ref('')
 
-const { handleSaveStory, saveError, isSaving } = useSaveStory(storyTitle, storyContent, selectedCategoryId)
+const { handleSaveStory, saveError, isSaving } = useSaveStory(storyTitle, storyContent, selectedCategoryId, storyDescription)
 const { categories, fetchCategories } = useFetchCategories()
 
 onMounted(async () => {
@@ -40,7 +41,7 @@ onMounted(async () => {
             <form @submit.prevent="handleSaveStory">
               <div class="mb-3">
                 <label for="storyTitle" class="form-label">Title</label>
-                <input type="text" id="storyTitle" class="form-control" v-model="storyTitle" placeholder="Enter your story title">
+                <input type="text" id="storyTitle" class="form-control" v-model="storyTitle" placeholder="Enter your story title...">
               </div>
               <div class="mb-3">
                 <label for="category" class="form-label">Category</label>
@@ -48,6 +49,10 @@ onMounted(async () => {
                   <option value="" disabled>Select a category</option>
                   <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
                 </select>
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" class="form-control" v-model="storyDescription" placeholder="Small synopsis of the story starts here..."></textarea>
               </div>
               <div class="mb-3">
                 <label for="quill-editor" class="form-label">Your Story</label>

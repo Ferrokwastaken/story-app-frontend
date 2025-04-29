@@ -1,7 +1,7 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 
-export function useSaveStory(storyTitle, storyContent, selectedCategoryId) {
+export function useSaveStory(storyTitle, storyContent, selectedCategoryId, storyDescription) {
   const router = useRouter()
   const saveError = ref(null)
   const isSaving = ref(false)
@@ -16,6 +16,7 @@ export function useSaveStory(storyTitle, storyContent, selectedCategoryId) {
         body: JSON.stringify({
           title: storyTitle.value,
           content: storyContent.value,
+          description: storyDescription.value,
           category_id: selectedCategoryId.value,
         }),
       })
