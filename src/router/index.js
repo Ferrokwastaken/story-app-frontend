@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router"; // Provided by Vue 
 import MainPage from "../components/MainPage.vue";
 import CreateStoryForm from "../components/CreateStoryForm.vue";
 import ShowStory from "../components/ShowStory.vue";
+import ModeratorLogin from "@/components/ModeratorLogin.vue";
 
 const routes = [
   {
@@ -18,6 +19,11 @@ const routes = [
     path: '/stories/:uuid',
     name: 'Show',
     component: ShowStory,
+  },
+  {
+    path: '/moderator/login',
+    name: 'ModeratorLogin',
+    component: ModeratorLogin,
   },
 ]
 
