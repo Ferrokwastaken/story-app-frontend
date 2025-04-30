@@ -3,6 +3,7 @@ import MainPage from "../components/MainPage.vue";
 import CreateStoryForm from "../components/CreateStoryForm.vue";
 import ShowStory from "../components/ShowStory.vue";
 import ModeratorLogin from "@/components/ModeratorLogin.vue";
+import ModeratorDashboard from "@/components/ModeratorDashboard.vue";
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/moderator/login',
     name: 'ModeratorLogin',
     component: ModeratorLogin,
+  },
+  {
+    path: '/moderator/dashboard',
+    name: 'ModeratorDashboard',
+    component: ModeratorDashboard,
   },
 ]
 
