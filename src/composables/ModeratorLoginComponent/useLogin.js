@@ -13,6 +13,10 @@ export function useLogin() {
     error.value = null
   
     try {
+      await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+        credentials: 'include',
+      })
+
       const response = await fetch('http://localhost:8000/api/moderator/login', {
         method: 'POST',
         headers: {

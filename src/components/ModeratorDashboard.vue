@@ -6,14 +6,25 @@ const pendingTags = ref(null)
 const loading = ref(false)
 const error = ref(null)
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
 const fetchPendingTags = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const response = await fetch('/api/moderator/stories', {
+
+    const csrfToken = getCookie('XSRF-TOKEN')
+    const response = await fetch('http://localhost:8000/api/moderator/stories', {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        'X-XSRF-TOKEN': csrfToken,
       },
+      credentials: 'include',
     });
     if (!response.ok) {
       error.value = 'Failed to fetch stories for pending tags.';
@@ -26,9 +37,12 @@ const fetchPendingTags = async () => {
     if (data && data.data && Array.isArray(data.data.data)) {
       for (const story of data.data.data) {
         const pendingTagsResponse = await fetch(`/api/moderator/stories/${story.uuid}/pending-tags`, {
+          method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            'X-XSRF-TOKEN': csrfToken,
           },
+          credentials: 'include',
         });
         if (pendingTagsResponse.ok) {
           const pendingTagsData = await pendingTagsResponse.json();
@@ -53,12 +67,17 @@ const fetchPendingTags = async () => {
 };
 
 const approveTag = async (storyUuid, tagId) => {
+  const csrfToken = getCookie('XSRF-TOKEN')
   try {
     const response = await fetch(`http://localhost:8000/api/moderator/stories/${storyUuid}/tags/${tagId}/approve`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        'Content-Type': 'application/json',
+        'X-XSRF-TOKEN': csrfToken,
       },
+      credentials: 'include',
+      body: JSON.stringify({}),
     })
     if (response.ok) {
       await fetchPendingTags()
@@ -73,12 +92,17 @@ const approveTag = async (storyUuid, tagId) => {
 }
 
 const rejectTag = async (storyUuid, tagId) => {
+  const csrfToken = getCookie('XSRF-TOKEN')
   try {
     const response = await fetch(`http://localhost:8000/api/moderator/stories/${storyUuid}/tags/${tagId}/reject`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        'Content-Type': 'application/json',
+        'X-XSRF-TOKEN': csrfToken,
       },
+      credentials: 'include',
+      body: JSON.stringify({}),
     })
     if (response.ok) {
       await fetchPendingTags()
