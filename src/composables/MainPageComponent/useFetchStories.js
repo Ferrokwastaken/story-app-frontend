@@ -1,10 +1,29 @@
 import { ref } from "vue"
 
+/**
+ * Composable for fetching and managing a list of stories, with optional filtering.
+ *
+ * @returns {object} An object containing reactive state and functions for interacting with stories.
+ */
 export function useFetchStories() {
   const stories = ref([])
   const error = ref(null)
 
-  // Start by fetching the stories without applying any filters
+  /**
+     * Fetches stories from the backend API, optionally applying filters.
+     *
+     * @param {string} [title='']  
+     * Optional title to filter stories by (performs a 'like' search).
+     * @param {string|number} [categoryId='']  
+     * Optional category ID to filter stories by.
+     * @param {string|null} [startDate=null]  
+     * Optional start date (YYYY-MM-DD) to filter stories by creation date range.
+     * @param {string|null} [endDate=null]  
+     * Optional end date (YYYY-MM-DD) to filter stories by creation date range.
+     * 
+     * @returns {Promise<void>} 
+     * A Promise that resolves when the fetch operation is complete.
+     */
   const fetchStories = async (title = '', categoryId = '', startDate = null, endDate = null) => {
     try {
       let url = 'http://localhost:8000/api/stories?'
