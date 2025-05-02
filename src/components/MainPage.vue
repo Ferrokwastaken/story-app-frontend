@@ -1,24 +1,49 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useFetchStories } from '@/composables/MainPageComponent/useFetchStories'
 import { useFetchCategories } from '@/composables/useFetchCategories'
 
-const router = useRouter()
 const filterTitle = ref('')
 const filterCategory = ref('')
+const dateRangeInput = ref(null)
+const selectedDateRange = ref({start: null, end: null})
 
 const { stories, error, fetchStories } = useFetchStories()
 const { categories, fetchCategories } = useFetchCategories()
 
 const applyFilters = () => {
   console.log(filterCategory.value)
-  fetchStories(filterTitle.value, filterCategory.value)
+  fetchStories(
+    filterTitle.value, 
+    filterCategory.value,
+    selectedDateRange.value.start,
+    selectedDateRange.value.end,
+  )
 }
 
-onMounted(() => {
-  fetchStories() // Initial load without filters
-  fetchCategories() // Load categories for the dropdown
+onMounted(async () => {
+  $(dateRangeInput.value).daterangepicker({
+    autoUpdateInput: false,
+    locale: {
+      format: 'YYYY-MM-DD',
+      cancelLabel: 'Clear'
+    }
+  }, (start, end, label) => {
+    $(dateRangeInput.value).val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'))
+    selectedDateRange.value.start = start.format('YYYY-MM-DD')
+    selectedDateRange.value.end = end.format('YYYY-MM-DD')
+    applyFilters()
+  })
+
+  $(dateRangeInput.value).on('cancel.daterangepicker', (ev, picker) => {
+    $(dateRangeInput.value).val('')
+    selectedDateRange.value.start = null
+    selectedDateRange.value.end = null
+    applyFilters()
+  })
+
+  await fetchStories() // Initial load without filters
+  await fetchCategories() // Load categories for the dropdown
 })
 </script>
 
@@ -44,6 +69,10 @@ onMounted(() => {
               category.id }}</option>
           </select>
         </div>
+        <div class="col-md6 mt-3">
+          <label for="dateRange" class="form-label">Filter by Date Range:</label>
+          <input type="text" id="dateRange" class="form-control" ref="dateRangeInput">
+        </div>
       </div>
     </div>
 
@@ -54,7 +83,10 @@ onMounted(() => {
           <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
             :data-bs-target="'#description-' + story.uuid" aria-expanded="false"
             aria-controls="'description-' + story.uuid" style="cursor: pointer;">
-            <h6 class="mb-0 text-dark">{{ story.title }}</h6>
+            <div>
+              <h6 class="mb-0 text-dark">{{ story.title }}</h6>
+              <small class="text-muted">Published: {{ story.created_at_formatted }}</small>
+            </div>
             <div>
               <span v-if="story.category" class="badge bg-secondary me-2">{{ story.category.name }}</span>
               <i class="bi bi-chevron-down"></i>
@@ -70,10 +102,6 @@ onMounted(() => {
       </ul>
       <div v-else class="fst-italic text-secondary text-center py-5">Loading stories...</div>
     </main>
-
-    <div class="container mt-4 text-center">
-      <router-link to="/create" class="btn btn-primary">Create Story</router-link>
-    </div>
   </div>
 </template>
 
