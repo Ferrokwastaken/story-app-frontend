@@ -4,67 +4,20 @@ import { useRoute } from 'vue-router';
 import { useFetchStory } from '@/composables/showStoryComponent/useFetchStory';
 import { useAddTagToStory } from '@/composables/showStoryComponent/useAddTagToStory';
 import { useFetchAvailableTags } from '@/composables/showStoryComponent/useFetchAvailableTags';
+import { useFetchComments } from '@/composables/showStoryComponent/useFetchComments';
 
 const route = useRoute()
 const showAddTags = ref(false)
-const storyUuid = ref(route.params.uuid)
-const comments = ref([])
-const newComment = ref('')
-const commentError = ref(null)
 
 const { story, loading, error, fetchStory } = useFetchStory()
 const { availableTags, fetchAvailableTags } = useFetchAvailableTags()
 const { addTagToStory, isTagAttached } = useAddTagToStory(story, fetchStory)
-
-const fetchComments = async () => {
-  try {
-    const response = await fetch(`http://localhost:8000/api/stories/${storyUuid.value}/comments`)
-    if (!response.ok) {
-      console.error('Failed to fetch comments:', await response.json())
-      return
-    }
-    const data = await response.json()
-    comments.value = data.data
-  } catch (err) {
-    console.error('Error fetching comments:', err)
-  }
-}
-
-const submitComment = async () => {
-  commentError.value = null
-  if (!newComment.value.trim()) {
-    commentError.value = 'Comment cannot be empty'
-    return
-  }
-
-  try {
-    const response = await fetch(`http://localhost:8000/api/stories/${storyUuid.value}/comments`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        content: newComment.value,
-      }),
-    })
-
-    if (response.ok) {
-      newComment.value = ''
-      await fetchComments()
-    } else {
-      const errorData = await response.json()
-      commentError.value = errorData.message || 'Failed to submit comment'
-      console.error('Error submitting comment:', errorData)
-    }
-  } catch (err) {
-    commentError.value = 'An error ocurred while submitting the comment'
-    console.error('Erro submitting comment:', err)
-  }
-}
+const { storyUuid, comments, newComment, commentError, fetchComments, submitComment } = useFetchComments()
 
 onMounted(async () => {
   await fetchStory()
   await fetchAvailableTags()
+  await fetchComments()
 })
 
 const toggleAddTags = () => {
