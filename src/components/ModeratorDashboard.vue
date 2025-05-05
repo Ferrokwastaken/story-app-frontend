@@ -1,155 +1,57 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
-const pendingTags = ref([])
-const loading = ref(false)
+const router = useRouter()
+const pendingTagCount = ref(0)
 const error = ref(null)
+const loading = ref(true)
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-}
-
-const fetchPendingTags = async () => {
-  loading.value = true;
-  error.value = null;
+onMounted(async () => {
   try {
-
-    const csrfToken = getCookie('XSRF-TOKEN')
-    const response = await fetch('http://localhost:8000/api/moderator/stories', {
-      method: 'GET',
+    const response = await fetch('http://localhost:8000/api/moderator/home', {
       headers: {
+        'Accept': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        'X-XSRF-TOKEN': csrfToken,
-      },
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      error.value = 'Failed to fetch stories for pending tags.';
-      console.error('Error fetching stories:', await response.json());
-      return; // Important to return here to prevent further errors
-    }
-    const data = await response.json();
-    let fetchedPendingTags = {};
-    // Access the actual array of stories using data.data.data (nested 'data' due to pagination)
-    if (data && data.data && Array.isArray(data.data.data)) {
-      for (const story of data.data.data) {
-        const pendingTagsResponse = await fetch(`http://localhost:8000/api/moderator/stories/${story.uuid}/pending-tags`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            'X-XSRF-TOKEN': csrfToken,
-          },
-          credentials: 'include',
-        });
-        if (pendingTagsResponse.ok) {
-          const pendingTagsData = await pendingTagsResponse.json();
-          // console.log(pendingTagsData.data.data)
-          console.log(Array.isArray(pendingTagsData.data.data))
-          if (pendingTagsData.data.data && Array.isArray(pendingTagsData.data.data) && pendingTagsData.data.data.length > 0) {
-            fetchedPendingTags[story.uuid] = pendingTagsData.data.data;
-            // console.log(fetchedPendingTags)
-          }
-        } else {
-          console.error(`Error fetching pending tags for story ${story.uuid}:`, await pendingTagsResponse.json());
-        }
       }
-      pendingTags.value = fetchedPendingTags;
-      // console.log(pendingTags.value)
-    } else {
-      console.error('Unexpected structure for stories data:', data);
-      error.value = 'Failed to process stories data.';
+    })
+
+    if (!response.ok) {
+      error.value = `Failed to fetch dashboard data: ${response.status}`
+      console.error('Failed to fetch dashboard data:', await response.json())
+      return;
     }
+
+    const data = await response.json()
+    pendingTagCount.value = data.pendingTagCount || 0
   } catch (err) {
-    error.value = 'An error occurred while loading pending tags.';
-    console.error('Error loading pending tags:', err);
+    error.value = `An error ocurred while fetching dashboard data: ${err.message}`
+    console.error('Error fetching dashboard data:', err)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
-
-const approveTag = async (storyUuid, tagId) => {
-  const csrfToken = getCookie('XSRF-TOKEN')
-  try {
-    const response = await fetch(`http://localhost:8000/api/moderator/stories/${storyUuid}/tags/${tagId}/approve`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        'Content-Type': 'application/json',
-        'X-XSRF-TOKEN': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify({}),
-    })
-    if (response.ok) {
-      await fetchPendingTags()
-    } else {
-      console.error('Failed to approve tag:', await response.json())
-      alert('Failed to approve tag')
-    }
-  } catch (error) {
-    console.error('Error approving tag:', error)
-    alert('Error approving tag.')
-  }
-}
-
-const rejectTag = async (storyUuid, tagId) => {
-  const csrfToken = getCookie('XSRF-TOKEN')
-  try {
-    const response = await fetch(`http://localhost:8000/api/moderator/stories/${storyUuid}/tags/${tagId}/reject`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        'Content-Type': 'application/json',
-        'X-XSRF-TOKEN': csrfToken,
-      },
-      credentials: 'include',
-      body: JSON.stringify({}),
-    })
-    if (response.ok) {
-      await fetchPendingTags()
-    } else {
-      console.error('Failed to reject tag:', await response.json())
-      alert('Failed to reject tag')
-    }
-  } catch (error) {
-    console.error('Error reject tag:', error)
-    alert('Error reject tag.')
-  }
-}
-
-onMounted(() => {
-  fetchPendingTags()
 })
 </script>
 
 <template>
-  <div class="container mt-5">
-    <h1>Moderator Dashboard</h1>
+<div class="container mt-5">
+  <h1>Moderator Dashboard</h1>
 
-    <div v-if="pendingTags && Object.keys(pendingTags).length > 0">
-      <h2>Pending User Tags</h2>
-      <div v-for="(tags, storyUuid) in pendingTags" :key="storyUuid" class="mb-4">
-        <h3>Story UUID: {{ storyUuid }}</h3>
-        <ul class="list-group">
-          <li v-for="tag in tags" :key="tag.id"
-            class="list-group-item d-flex justify-content-between align-items-center">
-            {{ tag.name }}
-            <div>
-              <button @click="approveTag(storyUuid, tag.id)" class="btn btn-sm btn-success me-2">Approve</button>
-              <button @click="rejectTag(storyUuid, tag.id)" class="btn btn-sm btn-danger">Reject</button>
-            </div>
-          </li>
-        </ul>
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title d-flex justify-content-between align-items-center">
+            Review Pending Tags
+            <span v-if="pendingTagCount" class="badge bg-warning rounded-pill">{{ pendingTagCount }}</span>
+          </h5>
+          <p class="card-text">Here you can review and approve or reject tags that users have suggested for stories.</p>
+          <router-link to="/moderator/pending-tags" class="btn btn-primary btn-sm">Go to Pending Tags</router-link>
+        </div>
       </div>
     </div>
-    <div v-else-if="loading">
-      Loading pending tags...
-    </div>
-    <div v-else>
-      No pending user tags.
-    </div>
   </div>
+</div>
 </template>
+
+<style scoped></style>
