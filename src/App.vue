@@ -74,9 +74,14 @@ watch(
             <li v-if="!isLoggedIn" class="nav-item">
               <router-link to="/moderator/login" class="nav-link" active-class="active">Moderator Login</router-link>
             </li>
-            <li v-if="isLoggedIn" class="nav-item">
-              <router-link to="/moderator/dashboard" class="nav-link" active-class="active">Dashboard</router-link>
-              <button @click="logout" class="nav-link btn btn-link text-decoration-none">Logout</button>
+            <li v-if="isLoggedIn" class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" id="userOptionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Options
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userOptionsDropdown">
+                <li><router-link to="/moderator/dashboard" class="dropdown-item" active-class="active">Dashboard</router-link></li>
+                <li class="dropdown-item" @click="logout" id="logoutButton">Logout</li>
+              </ul>
             </li>
             </ul>
           </div>
@@ -89,5 +94,7 @@ watch(
 </template>
 
 <style scoped>
-
+#logoutButton:hover {
+  cursor: pointer;
+}
 </style>
