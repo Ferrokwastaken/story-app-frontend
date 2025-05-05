@@ -1,5 +1,6 @@
 import { ref } from "vue"
 import { useRoute } from "vue-router"
+import Swal from 'sweetalert2';
 
 export function useFetchComments() {
   const route = useRoute()
@@ -53,6 +54,53 @@ export function useFetchComments() {
       console.error('Erro submitting comment:', err)
     }
   }
+
+  const reportComment = async (comment) => {
+    Swal.fire({
+      title: 'Report Comment',
+      html: `
+      <input type="text" id="report-reason" class="swal2-input" placeholder="Reason for report">
+      <textarea id="report-details" class="swal2-textarea" placeholder="Details (optional)"></textarea>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Submit Report',
+    preConfirm: async () => {
+      const reason = document.getElementById('report-reason').value
+      const details = document.getElementById('report-details').value
+      const userUuid = comment.user_uuid
+
+      if (!reason) {
+        Swal.showValidationMessage('Reason is required')
+        return false
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8000/api/comments/${comment.uuid}/report`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ reason, details, user_uuid: userUuid }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          Swal.showValidationMessage(errorData.message || 'Failed to report comment')
+          return false
+        }
+        return response.json()
+      } catch (error) {
+        Swal.showValidationMessage(`Request failed: ${error}`)
+        return false
+      }
+    },
+    allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire('Reported!', 'The comment has been reported.', 'success')
+      }
+    })
+  }
   
-  return {storyUuid, comments, newComment, commentError, fetchComments, submitComment}
+  return {storyUuid, comments, newComment, commentError, fetchComments, submitComment, reportComment}
 }

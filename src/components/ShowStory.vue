@@ -12,7 +12,7 @@ const showAddTags = ref(false)
 const { story, loading, error, fetchStory } = useFetchStory()
 const { availableTags, fetchAvailableTags } = useFetchAvailableTags()
 const { addTagToStory, isTagAttached } = useAddTagToStory(story, fetchStory)
-const { storyUuid, comments, newComment, commentError, fetchComments, submitComment } = useFetchComments()
+const { storyUuid, comments, newComment, commentError, fetchComments, submitComment, reportComment } = useFetchComments()
 
 onMounted(async () => {
   await fetchStory()
@@ -66,9 +66,10 @@ const toggleAddTags = () => {
 
             <h3>Comments</h3>
             <div v-if="comments && comments.length > 0">
-              <div v-for="comment in comments" :key="comment.uuid" class="mb-3 p-3 border rounded">
+              <div v-for="comment in comments" :key="comment.uuid" class="mb-3 p-3 border rounded d-flex justify-content-between align-items-start">
                 <p class="mb-1"><strong>User:</strong> {{ comment.user ? comment.user.name : 'Anonymous' }}</p>
                 <p class="mb-0">{{ comment.content }}</p>
+                <button class="btn btn-outline-danger btn-sm ms-2" @click="reportComment(comment)">Report</button>
               </div>
             </div>
             <div v-else class="text-muted">No comments yet. Be the first to comment!</div>
