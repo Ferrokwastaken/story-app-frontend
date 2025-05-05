@@ -5,6 +5,7 @@ import ShowStory from "../components/ShowStory.vue";
 import ModeratorLogin from "@/components/ModeratorLogin.vue";
 import ModeratorDashboard from "@/components/ModeratorDashboard.vue";
 import ModeratorPendingTags from "@/components/ModeratorPendingTags.vue";
+import ModeratorReports from "@/components/ModeratorReports.vue";
 
 const routes = [
   {
@@ -36,7 +37,12 @@ const routes = [
     path: '/moderator/pending-tags',
     name: 'ModeratorPendingTags',
     component: ModeratorPendingTags,
-  }
+  },
+  {
+    path: '/moderator/reports',
+    name: 'ModeratorReports',
+    component: ModeratorReports,
+  },
 ]
 
 const router = createRouter({

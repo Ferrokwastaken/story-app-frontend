@@ -1,3 +1,11 @@
+/**
+ * @description This component displays a list of items.
+ * It fetches data from an API and renders each item in a separate row.
+ * @props {Array} items - An array of items to display. Each item should have a 'name' and 'description' property.
+ * @method fetchData - Fetches data from the API.
+ * @event item-selected - Emitted when an item is selected.
+ * @todo Upgrade the UI and UX to improve user experience. Consider using a more modern design and adding features like search and filtering.
+ */
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'

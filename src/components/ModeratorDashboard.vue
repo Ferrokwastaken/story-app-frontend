@@ -50,6 +50,15 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <div class="col-md-6 mt-md-0 mt-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title d-flex justify-content-between align-items-center">Manage Reports</h5> 
+            <p class="card-text">View and manage reports submitted by users for inappropiate content</p>
+            <router-link to="/moderator/reports" class="btn btn-info btn-sm">View Reports</router-link>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </template>

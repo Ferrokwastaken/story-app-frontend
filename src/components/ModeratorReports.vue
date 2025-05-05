@@ -1,0 +1,59 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useFetchReports } from '@/composables/ModeratorReportsComponent/useFetchReports';
+import { useReportManagement } from '@/composables/ModeratorReportsComponent/useReportManagement';
+
+const { storyReports, commentReports, loading, error, fetchReports } = useFetchReports()
+
+const handleStoryReportDeleted = (reportId) => {
+  storyReports.value = storyReports.value.filter(report => report.id !== reportId)
+}
+
+const handleCommentReportDeleted = (reportId) => {
+  commentReports.value = commentReports.value.filter(report => report.id !== reportId);
+}
+
+const { deleteReport } = useReportManagement(handleStoryReportDeleted, handleCommentReportDeleted)
+
+onMounted(async () => {
+  fetchReports()
+})
+
+</script>
+
+<template>
+  <div class="container mt-5">
+    <h1>Reported Content</h1>
+    <div v-if="loading" class="alert alert-info">Loading reports...</div>
+    <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
+    <div v-else>
+      <h2>Comment Reports</h2>
+      <ul v-if="commentReports" class="list-group">
+        <li v-for="report in commentReports" :key="report.id" class="list-group-item">
+          <strong>Comment ID:</strong> {{ report.comment_uuid }} <br>
+          <strong>Reason:</strong> {{ report.reason }} <br>
+          <strong>Details:</strong> {{ report.details || 'No details provided.' }} <br>
+          <button class="btn btn-sm btn-outline-primary mt-2">View Comment</button>
+          <button class="btn btn-sm btn-outline-success mt-2 ms-2">Mark as Resolved</button>
+          <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'comment')">Delete Report</button>
+        </li>
+      </ul>
+      <div v-else class="alert alert-warning">No comment reports found</div>
+
+      <h2 class="mt-4">Story Reports</h2>
+      <ul v-if="storyReports" class="list-group mb-4">
+        <li v-for="report in storyReports" :key="report.id" class="list-group-item">
+          <strong>Story:</strong> {{ report.story ? report.story.title : 'Deleted Story' }}<br>
+          <strong>Reason:</strong> {{ report.reason }}<br>
+          <strong>Details:</strong> {{ report.details || 'No details provided.' }}<br>
+          <button class="btn btn-sm btn-outline-primary mt-2">View Story</button>
+          <button class="btn btn-sm btn-outline-success mt-2 ms-2">Mark as Resolved</button>
+          <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'story')">Delete Report</button>
+        </li>
+      </ul>
+      <div v-else class="alert alert-warning">No story reports found.</div>
+    </div>
+  </div>
+</template>
+
+<style scoped></style>
