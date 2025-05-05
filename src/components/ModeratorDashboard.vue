@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
-const pendingTags = ref(null)
+const pendingTags = ref([])
 const loading = ref(false)
 const error = ref(null)
 
@@ -36,7 +36,7 @@ const fetchPendingTags = async () => {
     // Access the actual array of stories using data.data.data (nested 'data' due to pagination)
     if (data && data.data && Array.isArray(data.data.data)) {
       for (const story of data.data.data) {
-        const pendingTagsResponse = await fetch(`/api/moderator/stories/${story.uuid}/pending-tags`, {
+        const pendingTagsResponse = await fetch(`http://localhost:8000/api/moderator/stories/${story.uuid}/pending-tags`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -46,14 +46,18 @@ const fetchPendingTags = async () => {
         });
         if (pendingTagsResponse.ok) {
           const pendingTagsData = await pendingTagsResponse.json();
-          if (pendingTagsData.data && Array.isArray(pendingTagsData.data) && pendingTagsData.data.length > 0) {
-            fetchedPendingTags[story.uuid] = pendingTagsData.data;
+          // console.log(pendingTagsData.data.data)
+          console.log(Array.isArray(pendingTagsData.data.data))
+          if (pendingTagsData.data.data && Array.isArray(pendingTagsData.data.data) && pendingTagsData.data.data.length > 0) {
+            fetchedPendingTags[story.uuid] = pendingTagsData.data.data;
+            // console.log(fetchedPendingTags)
           }
         } else {
           console.error(`Error fetching pending tags for story ${story.uuid}:`, await pendingTagsResponse.json());
         }
       }
       pendingTags.value = fetchedPendingTags;
+      // console.log(pendingTags.value)
     } else {
       console.error('Unexpected structure for stories data:', data);
       error.value = 'Failed to process stories data.';

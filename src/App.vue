@@ -75,6 +75,7 @@ watch(
               <router-link to="/moderator/login" class="nav-link" active-class="active">Moderator Login</router-link>
             </li>
             <li v-if="isLoggedIn" class="nav-item">
+              <router-link to="/moderator/dashboard" class="nav-link" active-class="active">Dashboard</router-link>
               <button @click="logout" class="nav-link btn btn-link text-decoration-none">Logout</button>
             </li>
             </ul>
