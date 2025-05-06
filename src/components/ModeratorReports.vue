@@ -10,10 +10,18 @@ const handleStoryReportDeleted = (reportId) => {
 }
 
 const handleCommentReportDeleted = (reportId) => {
-  commentReports.value = commentReports.value.filter(report => report.id !== reportId);
+  commentReports.value = commentReports.value.filter(report => report.id !== reportId)
 }
 
-const { deleteReport } = useReportManagement(handleStoryReportDeleted, handleCommentReportDeleted)
+const handleStoryResolved = (reportId) => {
+  storyReports.value = storyReports.value.filter(report => report.id !== reportId)
+}
+
+const handleCommentResolved = (reportId) => {
+  commentReports.value = commentReports.value.filter(report => report.id !== reportId)
+}
+
+const { deleteReport, resolveReport } = useReportManagement(handleStoryReportDeleted, handleCommentReportDeleted, handleStoryResolved, handleCommentResolved)
 
 onMounted(async () => {
   fetchReports()
@@ -39,7 +47,7 @@ onMounted(async () => {
             View Comment
           </router-link>
           <span v-else class="text-muted mt-2">Comment Deleted</span>
-          <button class="btn btn-sm btn-outline-success mt-2 ms-2">Mark as Resolved</button>
+          <button class="btn btn-sm btn-outline-success mt-2 ms-2" @click="resolveReport(report.id, 'comment')">Mark as Resolved</button>
           <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'comment')">
             Delete Report
           </button>
@@ -58,8 +66,7 @@ onMounted(async () => {
             View Story
           </router-link>
           <span v-else class="text-muted mt-2">Story Deleted</span>
-          <span v-else class="text-muted mt-2">Story Deleted</span>
-          <button class="btn btn-sm btn-outline-success mt-2 ms-2">Mark as Resolved</button>
+          <button class="btn btn-sm btn-outline-success mt-2 ms-2" @click="resolveReport(report.id, 'story')">Mark as Resolved</button>
           <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'story')">
             Delete Report
           </button>
