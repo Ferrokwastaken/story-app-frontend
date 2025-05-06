@@ -28,7 +28,7 @@ onMounted(async () => {
         initialHighlight.classList.add('initial-highlight')
         setTimeout(() => {
           initialHighlight.classList.remove('initial-highlight')
-        }, 1500)
+        }, 1000)
       }
     })
   }
@@ -99,7 +99,7 @@ const toggleAddTags = () => {
             <div v-if="comments && comments.length > 0">
               <div v-for="comment in comments" :key="comment.uuid" :id="`comment-${comment.uuid}`"
                 class="mb-3 p-3 border rounded d-flex justify-content-between align-items-start"
-                :class="{ 'highlighthed-comment': comment.uuid === highlightedCommentId }"
+                :class="{ 'highlighted-comment': comment.uuid === highlightedCommentId }"
                 >
                 <p class="mb-1"><strong>User:</strong> {{ comment.user ? comment.user.name : 'Anonymous' }}</p>
                 <p class="mb-0">{{ comment.content }}</p>
