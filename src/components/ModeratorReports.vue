@@ -33,9 +33,16 @@ onMounted(async () => {
           <strong>Comment ID:</strong> {{ report.comment_uuid }} <br>
           <strong>Reason:</strong> {{ report.reason }} <br>
           <strong>Details:</strong> {{ report.details || 'No details provided.' }} <br>
-          <button class="btn btn-sm btn-outline-primary mt-2">View Comment</button>
+          <router-link v-if="report.comment && report.comment.story_uuid && report.comment.uuid"
+            :to="`/stories/${report.comment.story_uuid}#comment-${report.comment.uuid}`"
+            class="btn btn-sm btn-outline-primary mt-2">
+            View Comment
+          </router-link>
+          <span v-else class="text-muted mt-2">Comment Deleted</span>
           <button class="btn btn-sm btn-outline-success mt-2 ms-2">Mark as Resolved</button>
-          <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'comment')">Delete Report</button>
+          <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'comment')">
+            Delete Report
+          </button>
         </li>
       </ul>
       <div v-else class="alert alert-warning">No comment reports found</div>
@@ -46,9 +53,16 @@ onMounted(async () => {
           <strong>Story:</strong> {{ report.story ? report.story.title : 'Deleted Story' }}<br>
           <strong>Reason:</strong> {{ report.reason }}<br>
           <strong>Details:</strong> {{ report.details || 'No details provided.' }}<br>
-          <button class="btn btn-sm btn-outline-primary mt-2">View Story</button>
+          <router-link v-if="report.story" :to="`/stories/${report.story.uuid}`"
+            class="btn btn-sm btn-outline-primary mt-2">
+            View Story
+          </router-link>
+          <span v-else class="text-muted mt-2">Story Deleted</span>
+          <span v-else class="text-muted mt-2">Story Deleted</span>
           <button class="btn btn-sm btn-outline-success mt-2 ms-2">Mark as Resolved</button>
-          <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'story')">Delete Report</button>
+          <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'story')">
+            Delete Report
+          </button>
         </li>
       </ul>
       <div v-else class="alert alert-warning">No story reports found.</div>
