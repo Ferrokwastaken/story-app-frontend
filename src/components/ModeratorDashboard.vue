@@ -6,6 +6,8 @@ const router = useRouter()
 const pendingTagCount = ref(0)
 const error = ref(null)
 const loading = ref(true)
+const storyReportCount = ref(0)
+const commentReportCount = ref(0)
 
 onMounted(async () => {
   try {
@@ -24,6 +26,8 @@ onMounted(async () => {
 
     const data = await response.json()
     pendingTagCount.value = data.pendingTagCount || 0
+    storyReportCount.value = data.storyReportCount || 0
+    commentReportCount.value = data.commentReportCount || 0
   } catch (err) {
     error.value = `An error ocurred while fetching dashboard data: ${err.message}`
     console.error('Error fetching dashboard data:', err)
@@ -53,7 +57,13 @@ onMounted(async () => {
     <div class="col-md-6 mt-md-0 mt-4">
       <div class="card shadow-sm">
         <div class="card-body">
-          <h5 class="card-title d-flex justify-content-between align-items-center">Manage Reports</h5> 
+          <h5 class="card-title d-flex justify-content-between align-items-center">
+            Manage Reports
+            <div>
+              <span v-if="storyReportCount" class="badge bg-danger rounder-pill me-2">{{ storyReportCount }}</span>
+              <span v-if="commentReportCount" class="badge bg-warning rounded-pill">{{ commentReportCount }}</span>
+            </div>
+          </h5> 
             <p class="card-text">View and manage reports submitted by users for inappropiate content</p>
             <router-link to="/moderator/reports" class="btn btn-info btn-sm">View Reports</router-link>
         </div>
