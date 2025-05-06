@@ -1,4 +1,5 @@
 import { ref } from "vue";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export function useFetchReports() {
   const storyReports = ref([])
@@ -10,7 +11,7 @@ export function useFetchReports() {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch('http://localhost:8000/api/moderator/reports', {
+      const response = await fetch(`${API_BASE_URL}/moderator/reports`, {
         headers: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,

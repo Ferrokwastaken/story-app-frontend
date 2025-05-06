@@ -1,10 +1,11 @@
 import { ref } from "vue"
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export function useReportManagement(onStoryReportDeleted, onCommentReportDeleted, onStoryReportResolved, onCommentReportResolved) {
   const deleteReport = async (reportId, reportType) => {
     if (confirm(`Are you sure you want to delete this ${reportType} report?`)) {
       try {
-        const response = await fetch(`http://localhost:8000/api/moderator/reports/${reportId}`, {
+        const response = await fetch(`${API_BASE_URL}/moderator/reports/${reportId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('authToken')}`,
@@ -30,7 +31,7 @@ export function useReportManagement(onStoryReportDeleted, onCommentReportDeleted
 
   const resolveReport = async (reportId, reportType) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/moderator/reports/${reportId}/resolve`, {
+      const response = await fetch(`${API_BASE_URL}/moderator/reports/${reportId}/resolve`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * Composable for saving a story in the database.
@@ -29,7 +30,7 @@ export function useSaveStory(storyTitle, storyContent, selectedCategoryId, story
    */
   const handleSaveStory = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/stories', {
+      const response = await fetch(`${API_BASE_URL}/stories`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

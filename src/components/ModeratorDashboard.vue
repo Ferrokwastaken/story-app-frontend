@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const router = useRouter()
 const pendingTagCount = ref(0)
@@ -11,7 +12,7 @@ const commentReportCount = ref(0)
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/moderator/home', {
+    const response = await fetch(`${API_BASE_URL}/moderator/home`, {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,

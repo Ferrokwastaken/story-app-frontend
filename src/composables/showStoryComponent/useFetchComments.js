@@ -1,6 +1,7 @@
 import { ref } from "vue"
 import { useRoute } from "vue-router"
 import Swal from 'sweetalert2';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export function useFetchComments() {
   const route = useRoute()
@@ -11,7 +12,7 @@ export function useFetchComments() {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/stories/${storyUuid.value}/comments`)
+      const response = await fetch(`${API_BASE_URL}/stories/${storyUuid.value}/comments`)
       if (!response.ok) {
         console.error('Failed to fetch comments:', await response.json())
         return
@@ -31,7 +32,7 @@ export function useFetchComments() {
     }
   
     try {
-      const response = await fetch(`http://localhost:8000/api/stories/${storyUuid.value}/comments`, {
+      const response = await fetch(`${API_BASE_URL}/stories/${storyUuid.value}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ export function useFetchComments() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8000/api/comments/${comment.uuid}/report`, {
+        const response = await fetch(`${API_BASE_URL}/comments/${comment.uuid}/report`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

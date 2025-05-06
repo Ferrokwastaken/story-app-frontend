@@ -1,4 +1,5 @@
 import { ref } from "vue";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export function useAddTagToStory(story, fetchStory) {
   const isTagAttached = (tagId) => {
@@ -11,7 +12,7 @@ export function useAddTagToStory(story, fetchStory) {
     }
   
     try {
-      const response = await fetch(`http://localhost:8000/api/stories/${story.value.uuid}/tags`, {
+      const response = await fetch(`${API_BASE_URL}/stories/${story.value.uuid}/tags`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

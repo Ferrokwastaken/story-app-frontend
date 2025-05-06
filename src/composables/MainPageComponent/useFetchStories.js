@@ -1,4 +1,5 @@
 import { ref } from "vue"
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * Composable for fetching and managing a list of stories, with optional filtering.
@@ -26,7 +27,7 @@ export function useFetchStories() {
      */
   const fetchStories = async (title = '', categoryId = '', startDate = null, endDate = null) => {
     try {
-      let url = 'http://localhost:8000/api/stories?'
+      let url = `${API_BASE_URL}/stories?`
       // If the request has either the title of a story or a category
       // add them to the URL
       if (title) {

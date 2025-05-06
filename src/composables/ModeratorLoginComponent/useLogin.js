@@ -1,5 +1,6 @@
 import { ref } from "vue"
 import { useRouter } from 'vue-router'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * Composable that fetches both a Laravel csrf-cookie, and the logic of
@@ -27,11 +28,11 @@ export function useLogin() {
     error.value = null
 
     try {
-      await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+      await fetch(`${API_BASE_URL}/sanctum/csrf-cookie`, {
         credentials: 'include',
       })
 
-      const response = await fetch('http://localhost:8000/api/moderator/login', {
+      const response = await fetch(`${API_BASE_URL}/moderator/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
