@@ -112,8 +112,9 @@ onMounted(async () => {
             :data-bs-target="'#description-' + story.uuid" aria-expanded="false"
             aria-controls="'description-' + story.uuid" style="cursor: pointer;">
             <div>
-              <h6 class="mb-0 text-dark">{{ story.title }}</h6>
-              <small class="text-muted">Published: {{ story.created_at_formatted }}</small>
+              <h6 class="mb-0 text-dark d-inline.block me-2">{{ story.title }}</h6>
+              <small v-if="story.average_rating" class="text-warning">({{ story.average_rating }})</small>
+              <small class="text-muted ms-2">Published: {{ story.created_at_formatted }}</small>
             </div>
             <div>
               <span v-if="story.category" class="badge bg-secondary me-2">{{ story.category.name }}</span>

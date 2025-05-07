@@ -6,6 +6,7 @@ import { useAddTagToStory } from '@/composables/showStoryComponent/useAddTagToSt
 import { useFetchAvailableTags } from '@/composables/showStoryComponent/useFetchAvailableTags';
 import { useFetchComments } from '@/composables/showStoryComponent/useFetchComments';
 import { useReportStory } from '@/composables/showStoryComponent/useReportStory';
+import { useSubmitRating } from '@/composables/showStoryComponent/useSubmitRating';
 
 const route = useRoute()
 const showAddTags = ref(false)
@@ -16,15 +17,7 @@ const { availableTags, fetchAvailableTags } = useFetchAvailableTags()
 const { addTagToStory, isTagAttached } = useAddTagToStory(story, fetchStory)
 const { comments, newComment, commentError, fetchComments, submitComment, reportComment } = useFetchComments(story)
 const { reportStory: reportStoryComposable } = useReportStory()
-
-const handleReportStory = () => {
-  if (story.value && story.value.uuid) {
-    console.log('THIS EXISTS:', story.value.uuid)
-    reportStoryComposable(story.value.uuid)
-  } else {
-    console.warn('Story UUID no available yet')
-  }
-}
+const { ratingError, isRatingSubmitting, ratingSuccessMessage, submitRating: submitRatingComposable } = useSubmitRating()
 
 onMounted(async () => {
   await fetchStory()
@@ -64,6 +57,24 @@ watch(() => route.hash, (newHash) => {
 
 const toggleAddTags = () => {
   showAddTags.value = !showAddTags.value
+}
+
+const handleReportStory = () => {
+  if (story.value && story.value.uuid) {
+    console.log('THIS EXISTS:', story.value.uuid)
+    reportStoryComposable(story.value.uuid)
+  } else {
+    console.warn('Story UUID no available yet')
+  }
+}
+
+const submitRating = async (ratingValue) => {
+  if (story.value && story.value.uuid) {
+    await submitRatingComposable(story.value.uuid, ratingValue)
+    await fetchStory()
+  } else {
+    console.warn('Story UUID not available yet, cannot submit rating.')
+  }
 }
 </script>
 
@@ -105,6 +116,21 @@ const toggleAddTags = () => {
             </div>
 
             <div class="mt-4" v-html="story.content"></div>
+
+            <div class="mt-3">
+              <h5>Rate this story</h5>
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm" @click="submitRating(1)">
+                  <i class="fa-solid fa-thumbs-down"></i> (1 Star)
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" @click="submitRating(5)">
+                  <i class="fa-solid fa-thumbs-up"></i> (5 Stars)
+                </button>
+                <div v-if="isRatingSubmitting" class="ms-2 text-muted">Submitting rating...</div>
+                <div v-if="ratingError" class="ms-2 text-danger">{{ ratingError }}</div>
+                <div v-if="ratingSuccessMessage" class="ms-2 text-success">{{ ratingSuccessMessage }}</div>
+              </div>
+            </div>
 
             <hr class="my-4">
 
