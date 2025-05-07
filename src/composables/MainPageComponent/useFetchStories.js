@@ -21,11 +21,15 @@ export function useFetchStories() {
      * Optional start date (YYYY-MM-DD) to filter stories by creation date range.
      * @param {string|null} [endDate=null]  
      * Optional end date (YYYY-MM-DD) to filter stories by creation date range.
+     * @param {string|null} [orderBy=null]
+     * 
+     * @param {string|null} [direction=null]
+     * 
      * 
      * @returns {Promise<void>} 
      * A Promise that resolves when the fetch operation is complete.
      */
-  const fetchStories = async (title = '', categoryId = '', startDate = null, endDate = null) => {
+  const fetchStories = async (title = '', categoryId = '', startDate = null, endDate = null, orderBy = null, direction = null) => {
     try {
       let url = `${API_BASE_URL}/stories?`
       // If the request has either the title of a story or a category
@@ -38,6 +42,12 @@ export function useFetchStories() {
       }
       if (startDate && endDate) {
         url += `start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}&`
+      }
+      if (orderBy) {
+        url += `order_by=${orderBy}&`
+        if (direction) {
+          url+= `direction=${direction}&`
+        }
       }
 
       url = url.slice(0, -1) // Remove the trailing '&' if any

@@ -7,17 +7,36 @@ const filterTitle = ref('')
 const filterCategory = ref('')
 const dateRangeInput = ref(null)
 const selectedDateRange = ref({start: null, end: null})
+const orderBy = ref('created_at_desc')
 
 const { stories, error, fetchStories } = useFetchStories()
 const { categories, fetchCategories } = useFetchCategories()
 
 const applyFilters = () => {
-  console.log(filterCategory.value)
+  let sortOrder = null
+  let sortDirection = null
+
+  if (orderBy.value === 'title_asc') {
+    sortOrder = 'title'
+    sortDirection = 'asc'
+  } else if (orderBy.value === 'title_desc') {
+    sortOrder = 'title'
+    sortDirection = 'desc'
+  } else if (orderBy.value === 'created_at_asc') {
+    sortOrder = 'created_at'
+    sortDirection = 'asc'
+  } else if (orderBy.value === 'created_at_desc') {
+    sortOrder = 'created_at'
+    sortDirection = 'desc'
+  }
+
   fetchStories(
     filterTitle.value, 
     filterCategory.value,
     selectedDateRange.value.start,
     selectedDateRange.value.end,
+    sortOrder,
+    sortDirection,
   )
 }
 
@@ -69,9 +88,18 @@ onMounted(async () => {
               category.id }}</option>
           </select>
         </div>
-        <div class="col-md6 mt-3">
+        <div class="col-md-6 mt-3">
           <label for="dateRange" class="form-label">Filter by Date Range:</label>
           <input type="text" id="dateRange" class="form-control" ref="dateRangeInput">
+        </div>
+        <div class="col-md-6 mt-3">
+          <label for="orderBy" class="form-label">Order By</label>
+          <select id="orderBy" class="form-select" v-model="orderBy" @change="applyFilters">
+            <option value="created_at_desc">Newest First</option>
+            <option value="created_at_asc">Oldest First</option>
+            <option value="title_asc">Title (A-Z)</option>
+            <option value="title_desc">Title (Z-A)</option>
+          </select>
         </div>
       </div>
     </div>
