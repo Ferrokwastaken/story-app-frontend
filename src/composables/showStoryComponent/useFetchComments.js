@@ -3,24 +3,25 @@ import { useRoute } from "vue-router"
 import Swal from 'sweetalert2';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export function useFetchComments() {
+export function useFetchComments(story) {
   const route = useRoute()
-  const storyUuid = ref(route.params.uuid)
   const comments = ref([])
   const newComment = ref('')
   const commentError = ref(null)
 
   const fetchComments = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/stories/${storyUuid.value}/comments`)
-      if (!response.ok) {
-        console.error('Failed to fetch comments:', await response.json())
-        return
+    if (story.value && story.value.uuid) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/stories/${story.value.uuid}/comments`)
+        if (!response.ok) {
+          console.error('Failed to fetch comments:', await response.json())
+          return
+        }
+        const data = await response.json()
+        comments.value = data.data
+      } catch (err) {
+        console.error('Error fetching comments:', err)
       }
-      const data = await response.json()
-      comments.value = data.data
-    } catch (err) {
-      console.error('Error fetching comments:', err)
     }
   }
 
@@ -32,7 +33,7 @@ export function useFetchComments() {
     }
   
     try {
-      const response = await fetch(`${API_BASE_URL}/stories/${storyUuid.value}/comments`, {
+      const response = await fetch(`${API_BASE_URL}/stories/${story.value.uuid}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,5 +104,5 @@ export function useFetchComments() {
     })
   }
   
-  return {storyUuid, comments, newComment, commentError, fetchComments, submitComment, reportComment}
+  return { comments, newComment, commentError, fetchComments, submitComment, reportComment}
 }

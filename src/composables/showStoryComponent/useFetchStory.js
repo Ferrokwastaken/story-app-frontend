@@ -2,20 +2,19 @@ import { ref } from 'vue'
 import { useRoute } from 'vue-router';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export function useFetchStory() {
+export function useFetchStory(storyUuidParam) {
   const route = useRoute()
   const story = ref(null)
   const loading = ref(false)
   const error = ref(null)
   
   const fetchStory = async () => {
-    const uuid = route.params.uuid
     loading.value = true
     error.value = null
     story.value = null
   
     try {
-      const response = await fetch(`${API_BASE_URL}/stories/${uuid}`)
+      const response = await fetch(`${API_BASE_URL}/stories/${storyUuidParam}`)
       if (!response.ok) {
         error.value = `Failed to load story: ${response.statusText}`
         return

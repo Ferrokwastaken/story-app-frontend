@@ -5,15 +5,26 @@ import { useFetchStory } from '@/composables/showStoryComponent/useFetchStory';
 import { useAddTagToStory } from '@/composables/showStoryComponent/useAddTagToStory';
 import { useFetchAvailableTags } from '@/composables/showStoryComponent/useFetchAvailableTags';
 import { useFetchComments } from '@/composables/showStoryComponent/useFetchComments';
+import { useReportStory } from '@/composables/showStoryComponent/useReportStory';
 
 const route = useRoute()
 const showAddTags = ref(false)
 const highlightedCommentId = ref(null)
 
-const { story, loading, error, fetchStory } = useFetchStory()
+const { story, loading, error, fetchStory } = useFetchStory(route.params.uuid)
 const { availableTags, fetchAvailableTags } = useFetchAvailableTags()
 const { addTagToStory, isTagAttached } = useAddTagToStory(story, fetchStory)
-const { storyUuid, comments, newComment, commentError, fetchComments, submitComment, reportComment } = useFetchComments()
+const { comments, newComment, commentError, fetchComments, submitComment, reportComment } = useFetchComments(story)
+const { reportStory: reportStoryComposable } = useReportStory()
+
+const handleReportStory = () => {
+  if (story.value && story.value.uuid) {
+    console.log('THIS EXISTS:', story.value.uuid)
+    reportStoryComposable(story.value.uuid)
+  } else {
+    console.warn('Story UUID no available yet')
+  }
+}
 
 onMounted(async () => {
   await fetchStory()
@@ -62,8 +73,10 @@ const toggleAddTags = () => {
       <div class="col-md-8">
         <div class="card shadow-sm">
           <div class="card-body p-4" v-if="story">
-            <h2 class="card-title">{{ story.title }}</h2>
-
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="card-title">{{ story.title }}</h2>
+              <button class="btn btn-outline-danger btn-sm" @click="handleReportStory" :disabled="!story?.uuid">Report Story</button>
+            </div>
             <div v-if="story.tags && story.tags.length > 0" class="mb-3">
               <span v-for="tag in story.tags" :key="tag.id" class="badge bg-secondary me-2">{{ tag.name }}</span>
             </div>
@@ -99,8 +112,7 @@ const toggleAddTags = () => {
             <div v-if="comments && comments.length > 0">
               <div v-for="comment in comments" :key="comment.uuid" :id="`comment-${comment.uuid}`"
                 class="mb-3 p-3 border rounded d-flex justify-content-between align-items-start"
-                :class="{ 'highlighted-comment': comment.uuid === highlightedCommentId }"
-                >
+                :class="{ 'highlighted-comment': comment.uuid === highlightedCommentId }">
                 <p class="mb-1"><strong>User:</strong> {{ comment.user ? comment.user.name : 'Anonymous' }}</p>
                 <p class="mb-0">{{ comment.content }}</p>
                 <button class="btn btn-outline-danger btn-sm ms-2" @click="reportComment(comment)">Report</button>
