@@ -12,6 +12,22 @@ const orderBy = ref('created_at_desc')
 const { stories, error, fetchStories } = useFetchStories()
 const { categories, fetchCategories } = useFetchCategories()
 
+const ratingColorBad = import.meta.env.VITE_RATING_COLOR_BAD || 'danger';
+const ratingColorMedium = import.meta.env.VITE_RATING_COLOR_MEDIUM || 'warning';
+const ratingColorGood = import.meta.env.VITE_RATING_COLOR_GOOD || 'success';
+const ratingThresholdMedium = parseFloat(import.meta.env.VITE_RATING_THRESHOLD_MEDIUM || '2.5');
+const ratingThresholdGood = parseFloat(import.meta.env.VITE_RATING_THRESHOLD_GOOD || '4');
+
+const ratingColorClass = (rating) => {
+  if (rating < ratingThresholdMedium) {
+    return `text-${ratingColorBad}`
+  } else if (rating < ratingThresholdGood) {
+    return `text-${ratingColorMedium}`
+  } else {
+    return `text-${ratingColorGood}`
+  }
+}
+
 const applyFilters = () => {
   let sortOrder = null
   let sortDirection = null
@@ -113,7 +129,7 @@ onMounted(async () => {
             aria-controls="'description-' + story.uuid" style="cursor: pointer;">
             <div>
               <h6 class="mb-0 text-dark d-inline.block me-2">{{ story.title }}</h6>
-              <small v-if="story.average_rating" class="text-warning">({{ story.average_rating }})</small>
+              <small v-if="story.average_rating" :class="ratingColorClass(story.average_rating)">({{ story.average_rating }})</small>
               <small class="text-muted ms-2">Published: {{ story.created_at_formatted }}</small>
             </div>
             <div>
