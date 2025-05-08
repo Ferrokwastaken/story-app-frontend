@@ -7,7 +7,7 @@ export function useReportManagement(onStoryReportDeleted, onCommentReportDeleted
     const result = await Swal.fire({
       title: 'Delete report',
       text: `Are you sure you want to delete this ${reportType} report?`,
-      icon: 'warning',
+      icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Yes, delete the report',
       cancelButtonText: 'Cancel',

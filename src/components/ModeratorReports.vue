@@ -2,8 +2,10 @@
 import { ref, onMounted } from 'vue';
 import { useFetchReports } from '@/composables/ModeratorReportsComponent/useFetchReports';
 import { useReportManagement } from '@/composables/ModeratorReportsComponent/useReportManagement';
+import { useDeleteComment } from '@/composables/useDeleteComment';
 
 const { storyReports, commentReports, loading, error, fetchReports } = useFetchReports()
+const { deleteCommentError, isDeletingComment, deleteCommentSuccessMessage, deleteComment } = useDeleteComment()
 
 const handleStoryReportDeleted = (reportId) => {
   storyReports.value = storyReports.value.filter(report => report.id !== reportId)
@@ -22,6 +24,17 @@ const handleCommentResolved = (reportId) => {
 }
 
 const { deleteReport, resolveReport } = useReportManagement(handleStoryReportDeleted, handleCommentReportDeleted, handleStoryResolved, handleCommentResolved)
+
+const handleDeleteComment = async (comment) => {
+  if (comment && comment.uuid) {
+    const success = await deleteComment(comment.uuid)
+    if (success) {
+      commentReports.value = commentReports.value.filter(report => report.comment?.uuid !== comment.uuid)
+    }
+  } else {
+    console.warn('Invalid comment object')
+  }
+}
 
 onMounted(async () => {
   fetchReports()
@@ -48,9 +61,13 @@ onMounted(async () => {
           </router-link>
           <span v-else class="text-muted mt-2">Comment Deleted</span>
           <button class="btn btn-sm btn-outline-success mt-2 ms-2" @click="resolveReport(report.id, 'comment')">Mark as Resolved</button>
-          <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'comment')">
+          <button class="btn btn-sm btn-outline-warning mt-2 ms-2" @click="deleteReport(report.id, 'comment')">
             Delete Report
           </button>
+          <button v-if="report.comment && report.comment.uuid" class="btn btn-sm btn-danger mt-2 ms-2" @click="handleDeleteComment(report.comment)" :disabled="isDeletingComment">
+            <i class="bi bi-trash"></i> Delete Comment
+          </button>
+          <span v-if="isDeletingComment" class="ms-2 text-muted">Deleting...</span>
         </li>
       </ul>
       <div v-else class="alert alert-warning">No comment reports found</div>
@@ -67,7 +84,7 @@ onMounted(async () => {
           </router-link>
           <span v-else class="text-muted mt-2">Story Deleted</span>
           <button class="btn btn-sm btn-outline-success mt-2 ms-2" @click="resolveReport(report.id, 'story')">Mark as Resolved</button>
-          <button class="btn btn-sm btn-outline-danger mt-2 ms-2" @click="deleteReport(report.id, 'story')">
+          <button class="btn btn-sm btn-outline-danger text-secondary mt-2 ms-2" @click="deleteReport(report.id, 'story')">
             Delete Report
           </button>
         </li>

@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useLogin } from '@/composables/ModeratorLoginComponent/useLogin'
+import { useLogin } from '@/composables/useLogin'
 
-const {email, password, error, isLogginIn, login} = useLogin()
+const {email, username, password, error, isLogginIn, login} = useLogin()
 
 </script>
 

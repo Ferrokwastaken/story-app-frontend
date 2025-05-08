@@ -7,10 +7,13 @@ import { useFetchAvailableTags } from '@/composables/showStoryComponent/useFetch
 import { useFetchComments } from '@/composables/showStoryComponent/useFetchComments';
 import { useReportStory } from '@/composables/showStoryComponent/useReportStory';
 import { useSubmitRating } from '@/composables/showStoryComponent/useSubmitRating';
+import { useDeleteComment } from '@/composables/useDeleteComment';
 
 const route = useRoute()
 const showAddTags = ref(false)
 const highlightedCommentId = ref(null)
+const isLoggedIn = ref(false)
+const username = ref(null)
 
 const { story, loading, error, fetchStory } = useFetchStory(route.params.uuid)
 const { availableTags, fetchAvailableTags } = useFetchAvailableTags()
@@ -18,11 +21,25 @@ const { addTagToStory, isTagAttached } = useAddTagToStory(story, fetchStory)
 const { comments, newComment, commentError, fetchComments, submitComment, reportComment } = useFetchComments(story)
 const { reportStory: reportStoryComposable } = useReportStory()
 const { ratingError, isRatingSubmitting, ratingSuccessMessage, submitRating: submitRatingComposable } = useSubmitRating()
+const { deleteCommentError, isDeletingComment, deleteCommentSuccessMessage, deleteComment } = useDeleteComment()
+
+const checkAuth = () => {
+  const token = localStorage.getItem('authToken'); // Assuming you store a token on login
+  if (token) {
+    isLoggedIn.value = true;
+    username.value = 'Moderator'; // Placeholder for now
+    // In a real scenario, you might decode the token to get user roles/permissions
+  } else {
+    isLoggedIn.value = false;
+    username.value = null;
+  }
+}
 
 onMounted(async () => {
   await fetchStory()
   await fetchAvailableTags()
   await fetchComments()
+  checkAuth()
   if (route.hash) {
     highlightedCommentId.value = route.hash.substring(1).replace('comment-', '')
 
@@ -76,6 +93,17 @@ const submitRating = async (ratingValue) => {
     console.warn('Story UUID not available yet, cannot submit rating.')
   }
 }
+
+const handleDeleteComment = async (comment) => {
+  if (isLoggedIn.value && comment && comment.uuid) {
+    const success = await deleteComment(comment.uuid)
+    if (success) {
+      comments.value = comments.value.filter(c => c.uuid !== comment.uuid)
+    }
+  } else {
+    console.warn('Not logged in as moderator or invalid comment')
+  }
+}
 </script>
 
 <template>
@@ -86,7 +114,8 @@ const submitRating = async (ratingValue) => {
           <div class="card-body p-4" v-if="story">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h2 class="card-title">{{ story.title }}</h2>
-              <button class="btn btn-outline-danger btn-sm" @click="handleReportStory" :disabled="!story?.uuid">Report Story</button>
+              <button class="btn btn-outline-danger btn-sm" @click="handleReportStory" :disabled="!story?.uuid">Report
+                Story</button>
             </div>
             <div v-if="story.tags && story.tags.length > 0" class="mb-3">
               <span v-for="tag in story.tags" :key="tag.id" class="badge bg-secondary me-2">{{ tag.name }}</span>
@@ -141,7 +170,11 @@ const submitRating = async (ratingValue) => {
                 :class="{ 'highlighted-comment': comment.uuid === highlightedCommentId }">
                 <p class="mb-1"><strong>User:</strong> {{ comment.user ? comment.user.name : 'Anonymous' }}</p>
                 <p class="mb-0">{{ comment.content }}</p>
-                <button class="btn btn-outline-danger btn-sm ms-2" @click="reportComment(comment)">Report</button>
+                <button class="btn btn-warning btn-sm ms-2" @click="reportComment(comment)">Report</button>
+                <button v-if="isLoggedIn" class="btn btn-danger btn-sm ms-2" @click="handleDeleteComment(comment)" :disabled="isDeletingComment">
+                  <i class="fa-solid fa-trash"></i> Delete
+                </button>
+                <span v-if="isDeletingComment" class="ms-2 text-muted">Deleting...</span>
               </div>
             </div>
             <div v-else class="text-muted">No comments yet. Be the first to comment!</div>
