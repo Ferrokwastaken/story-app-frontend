@@ -12,8 +12,9 @@ const storyTitle = ref('')
 const router = useRouter()
 const selectedCategoryId = ref('')
 const storyDescription = ref('')
+const storyTags = ref('')
 
-const { handleSaveStory, saveError, isSaving } = useSaveStory(storyTitle, storyContent, selectedCategoryId, storyDescription)
+const { handleSaveStory, saveError, isSaving } = useSaveStory(storyTitle, storyContent, selectedCategoryId, storyDescription, storyTags)
 const { categories, fetchCategories } = useFetchCategories()
 
 onMounted(async () => {
@@ -53,6 +54,10 @@ onMounted(async () => {
               <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
                 <textarea id="description" class="form-control" v-model="storyDescription" placeholder="Small synopsis of the story starts here..."></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="storyTags" class="form-label">Tags (separate by commas)</label>
+                <input type="text" id="storyTags" class="form-control" v-model="storyTags" placeholder="Enter tags (e.g., fantasy, adventure, sci-fi)">
               </div>
               <div class="mb-3">
                 <label for="quill-editor" class="form-label">Your Story</label>

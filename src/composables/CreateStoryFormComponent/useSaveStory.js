@@ -18,7 +18,7 @@ import Swal from "sweetalert2";
  * @returns {object}
  * An object containing reactive states and a function for saving stories
  */
-export function useSaveStory(storyTitle, storyContent, selectedCategoryId, storyDescription) {
+export function useSaveStory(storyTitle, storyContent, selectedCategoryId, storyDescription, storyTags) {
   const router = useRouter()
   const saveError = ref(null)
   const isSaving = ref(false)
@@ -48,6 +48,7 @@ export function useSaveStory(storyTitle, storyContent, selectedCategoryId, story
           content: storyContent.value,
           description: storyDescription.value,
           category_id: selectedCategoryId.value,
+          tags: storyTags.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
         }),
       })
   
